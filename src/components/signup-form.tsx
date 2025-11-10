@@ -27,10 +27,6 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         <form>
           <FieldGroup>
             <Field>
-              <FieldLabel htmlFor="name">Full Name</FieldLabel>
-              <Input id="name" type="text" placeholder="John Doe" required />
-            </Field>
-            <Field>
               <FieldLabel htmlFor="email">Email</FieldLabel>
               <Input
                 id="email"
@@ -64,7 +60,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                   Sign up with Google
                 </Button>
                 <FieldDescription className="px-6 text-center">
-                  Already have an account? <a href="login">Sign in</a>
+                  Already have an account? <a href="/login">Sign in</a>
                 </FieldDescription>
               </Field>
             </FieldGroup>

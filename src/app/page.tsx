@@ -1,11 +1,20 @@
-'use client';
 import { Calendar } from "@/components/ui/calendar";
 import { Progress } from "@/components/ui/progress";
+import { createClient } from "@/utils/supabase/server";
+import { redirect } from "next/navigation";
 
 import React from "react";
 
-export default function HomePage() {
-  const [date, setDate] = React.useState<Date | undefined>(new Date())
+export default async function HomePage() {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase.auth.getUser();
+
+  if(error || !data.user) {
+    redirect("/login")
+  }
+
+  // const [date, setDate] = React.useState<Date | undefined>(new Date())
 
   return (
     <div className="space-y-4">
@@ -68,8 +77,8 @@ export default function HomePage() {
             className="rounded-md border shadow-sm"
             mode="single"
             // captionLayout="dropdown"
-            selected={date}
-            onSelect={setDate}
+            selected={new Date()}
+            // onSelect={setDate}
           />
         </div>
       </div>

@@ -1,21 +1,29 @@
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { Home, MessageSquare } from "lucide-react";
+import { NavUser } from "./nav-user";
 
 type Props = { className?: string };
 
 export function AppSidebar({ className }: Props) {
-  const items = [
-    {
-      title: 'Dashboard',
-      url: '/',
-      icon: Home,
+  const data = {
+    user: {
+      name: "John Doe",
+      email: "john.doe@example.com",
+      avatar: "https://i.pravatar.cc/150?img=3",
     },
-    {
-      title: 'Feedback',
-      url: '/feedback',
-      icon: MessageSquare,
-    }
-  ]
+    items: [
+      {
+        title: 'Dashboard',
+        url: '/',
+        icon: Home,
+      },
+      {
+        title: 'Feedback',
+        url: '/feedback',
+        icon: MessageSquare,
+      }
+    ]
+  }
 
   return (
     <aside className={`sticky top-[7rem] h-[calc(100vh-7rem)] overflow-auto ${className ?? "" }`}>
@@ -33,7 +41,7 @@ export function AppSidebar({ className }: Props) {
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
-                {items.map((item) => (
+                {data.items.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
                       <a href={item.url}>
@@ -47,6 +55,9 @@ export function AppSidebar({ className }: Props) {
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent> 
+        <SidebarFooter>
+          <NavUser user={data.user} />
+        </SidebarFooter>
       </Sidebar>
     </aside>
   );

@@ -14,11 +14,15 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { login } from "../app/auth/actions/auth"
+import { useRouter } from "next/navigation"
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const router = useRouter();
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
@@ -35,6 +39,7 @@ export function LoginForm({
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   placeholder="m@example.com"
                   required
@@ -50,15 +55,23 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input id="password" name="password" type="password" required />
               </Field>
               <Field>
-                <Button type="submit">Login</Button>
+                <Button type="submit" formAction={login}>Login</Button>
                 <Button variant="outline" type="button">
                   Login with Google
                 </Button>
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a href="register">Sign up</a>
+                  Don&apos;t have an account?{" "}
+                  <Button
+                    variant="link"
+                    type="button"
+                    className="p-0 h-auto text-sm underline"
+                    onClick={() => router.push("/register")}
+                  >
+                    Sign up
+                  </Button>
                 </FieldDescription>
               </Field>
             </FieldGroup>

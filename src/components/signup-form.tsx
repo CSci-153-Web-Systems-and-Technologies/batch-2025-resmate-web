@@ -1,3 +1,6 @@
+"use client"
+
+import { signup } from "@/app/auth/actions/auth"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -13,8 +16,49 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { useState } from "react"
+import { useFormStatus } from "react-dom"
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button type="submit" disabled={pending}>
+      {pending ? "Creating account..." : "Create Account"}
+    </Button>
+  )
+}
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
+
+  const [error, setError] = useState<string | null>(null);
+  const [passwordMatch, setPasswordMatch] = useState(true);
+
+  const handleSubmit = async (formData: FormData) => {
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirm-password") as string;
+
+    if(password !== confirmPassword) {
+      setPasswordMatch(false);
+      setError("Passwords do not match.");
+      return;
+    }
+
+    if(password.length < 8) {
+      setError("Password must be at least 8 characters long.");
+      return;
+    }
+
+    setPasswordMatch(true);
+    setError(null);
+
+    try {
+      await signup(formData);
+    } catch (err) {
+      setError("An error occurred during signup. Please try again.");
+    }
+  }
+
   return (
     <Card {...props}>
       <CardHeader>
@@ -24,16 +68,18 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form>
+        <form action={handleSubmit}>
           <FieldGroup>
-            <Field>
-              <FieldLabel htmlFor="name">Full Name</FieldLabel>
-              <Input id="name" type="text" placeholder="John Doe" required />
-            </Field>
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+                {error}
+              </div>
+            )}
             <Field>
               <FieldLabel htmlFor="email">Email</FieldLabel>
               <Input
                 id="email"
+                name="email"
                 type="email"
                 placeholder="m@example.com"
                 required
@@ -45,7 +91,14 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
             </Field>
             <Field>
               <FieldLabel htmlFor="password">Password</FieldLabel>
-              <Input id="password" type="password" required />
+              <Input 
+                id="password" 
+                name="password" 
+                type="password" 
+                minLength={8} 
+                required 
+                className={error && !passwordMatch ? "border-red-500" : ""}
+              />
               <FieldDescription>
                 Must be at least 8 characters long.
               </FieldDescription>
@@ -54,17 +107,26 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               <FieldLabel htmlFor="confirm-password">
                 Confirm Password
               </FieldLabel>
-              <Input id="confirm-password" type="password" required />
-              <FieldDescription>Please confirm your password.</FieldDescription>
+              <Input 
+                id="confirm-password" 
+                name="confirm-password" 
+                type="password" 
+                minLength={8}
+                required 
+                className={!passwordMatch ? "border-red-500" : ""}
+              />
+              <FieldDescription className={!passwordMatch ? "text-red-500" : ""}>
+                {!passwordMatch ? "Passwords do not match" : "Please confirm your password."}
+              </FieldDescription>
             </Field>
             <FieldGroup>
               <Field>
-                <Button type="submit">Create Account</Button>
+                <SubmitButton />
                 <Button variant="outline" type="button">
                   Sign up with Google
                 </Button>
                 <FieldDescription className="px-6 text-center">
-                  Already have an account? <a href="login">Sign in</a>
+                  Already have an account? <a href="/login">Sign in</a>
                 </FieldDescription>
               </Field>
             </FieldGroup>

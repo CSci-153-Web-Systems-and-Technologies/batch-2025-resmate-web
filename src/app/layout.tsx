@@ -11,7 +11,7 @@ export default function RootLayout({
 }) {
   const pathname = usePathname();
 
-  if (pathname.startsWith("/login") || pathname.startsWith("/register")) {
+  if (pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/setup") || pathname.startsWith("/otp")) {
     return (
       <html lang="en">
         <body className="bg-blue-100">

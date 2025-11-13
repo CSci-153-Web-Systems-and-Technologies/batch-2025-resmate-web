@@ -14,7 +14,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { login } from "../app/auth/actions/auth"
+import { login } from "../lib/auth/actions/auth"
 
 export function LoginForm({
   className,

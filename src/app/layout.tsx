@@ -1,5 +1,5 @@
 'use client';
-import { SidebarProvider } from "@/components/ui/sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import "./globals.css";
 import { usePathname } from "next/navigation";
 import { AppSidebar } from "./components/app-sidebar";
@@ -11,10 +11,12 @@ export default function RootLayout({
 }) {
   const pathname = usePathname();
 
-  if (pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/setup") || pathname.startsWith("/otp")) {
+  const isAuthRoute = pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/setup") || pathname.startsWith("/otp");
+
+  if (isAuthRoute) {
     return (
       <html lang="en">
-        <body className="bg-blue-100">
+        <body>
           {children}
         </body>
       </html>
@@ -25,14 +27,13 @@ export default function RootLayout({
     <html lang="en">
       <body className="bg-amber-100">
         <SidebarProvider>
-          <div className="min-h-screen grid grid-cols-[16rem_1fr] grid-rows-[auto_1fr] gap-4 p-4">
-
-
+          <div className="min-h-screen grid grid-cols-[16rem_1fr] grid-rows-[auto_1fr]">
+            
             <aside className="row-start-2 col-start-1">
               <AppSidebar />
             </aside>
 
-            <main className="row-start-2 col-start-2 p-4">
+            <main className="row-start-2 col-start-2">
               {children}
             </main>
           </div>

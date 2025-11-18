@@ -1,27 +1,32 @@
+'use client'
+
 import { Calendar } from "@/components/ui/calendar";
 import { Progress } from "@/components/ui/progress";
-import { createClient } from "@/utils/supabase/server";
-import { redirect } from "next/navigation";
+import { getCurrentUser } from "@/lib/auth/actions/auth";
+import { User } from "@/lib/model/user";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-export default async function HomePage() {
-  const supabase = await createClient();
+export default function HomePage() {
 
-  const { data, error } = await supabase.auth.getUser();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading , setLoading] = useState(true);
 
-  if(error || !data.user) {
-    redirect("/login")
-  }
-
-  // const [date, setDate] = React.useState<Date | undefined>(new Date())
+  useEffect(() => {
+    async function loadUser() {
+      const currentUser = await getCurrentUser();
+      setUser(currentUser);
+      setLoading(false);
+    }
+    loadUser();
+  }, []);
 
   return (
     <div className="space-y-4">
       <div className="bg-white p-4 rounded-md">
         <div>
           <h3>Development of Thesis Document Advising and Critique Review System</h3>
-          <p>Primary Adviser: Jhon Anthony Varron</p>
+          <p>Primary Adviser: {user?.firstName} {user?.lastName}</p>
         </div>
 
         <div className="grid grid-cols-3 gap-10">

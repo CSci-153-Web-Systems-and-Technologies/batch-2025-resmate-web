@@ -29,18 +29,32 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+<<<<<<< Updated upstream
 import { logout } from "@/app/auth/actions/auth"
+=======
+import { getCurrentUser, logout } from "@/lib/auth/actions/auth"
+>>>>>>> Stashed changes
+import { getCurrentUser, logout } from "@/lib/auth/actions/auth"
 import { useRouter } from "next/navigation"
+import { User } from "@/lib/model/user"
 
 export function NavUser({
   user,
 }: {
+<<<<<<< Updated upstream
+<<<<<<< HEAD
+  user: User
+=======
   user: {
     name: string
     email: string
     avatar: string
   },
 
+=======
+  user: User
+>>>>>>> Stashed changes
+>>>>>>> feature/frontend-implementation
 }) {
   const { isMobile } = useSidebar()
   const router = useRouter();
@@ -49,6 +63,10 @@ export function NavUser({
     await logout();
     router.push("/login");
   };
+  const avatar = "https://i.pravatar.cc/150?img=3"
+
+  const userInitials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
+  const fullName = `${user.firstName} ${user.lastName}`;
 
   return (
     <SidebarMenu>
@@ -60,11 +78,11 @@ export function NavUser({
               className="text-white data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarImage src={avatar} alt={userInitials} />
+                <AvatarFallback className="rounded-lg">{userInitials}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
+                <span className="truncate font-medium">{fullName}</span>
                 <span className="truncate text-xs">{user.email}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
@@ -79,11 +97,11 @@ export function NavUser({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  <AvatarImage src={avatar} alt={userInitials} />
+                  <AvatarFallback className="rounded-lg">{userInitials}</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
+                  <span className="truncate font-medium">{fullName}</span>
                   <span className="truncate text-xs">{user.email}</span>
                 </div>
               </div>

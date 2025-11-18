@@ -36,8 +36,8 @@ export function AppSidebar({ className }: Props) {
 
   return (
     <aside className={`sticky top-[7rem] h-[calc(100vh-7rem)] overflow-auto ${className ?? "" }`}>
-      <Sidebar side="left" variant="sidebar" collapsible="offcanvas">
-        <SidebarHeader className="border-b p-4"> 
+      <Sidebar side="left" variant="sidebar" collapsible="offcanvas" >
+        <SidebarHeader className="border-b p-4 bg-slate-950"> 
           <div className="flex items-center gap-2"> 
             <div className="bg-blue-600 text-white w-8 h-8 rounded flex items-center justify-center font-bold">
               Logo
@@ -46,13 +46,13 @@ export function AppSidebar({ className }: Props) {
           </div>
         </SidebarHeader>
 
-        <SidebarContent>
+        <SidebarContent className="bg-slate-950">
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
                 {items.map((item) => (
                   <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
+                    <SidebarMenuButton asChild className="text-white">
                       <a href={item.url}>
                         <item.icon />
                         <span>{item.title}</span>

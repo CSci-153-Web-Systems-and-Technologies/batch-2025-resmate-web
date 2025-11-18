@@ -64,13 +64,8 @@ export function AppSidebar({ className }: Props) {
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent> 
-<<<<<<< Updated upstream
-        <SidebarFooter className="bg-slate-950">
-          <NavUser user={data.user}/>
-=======
         <SidebarFooter>
           {!loading && user && <NavUser user={user} />}
->>>>>>> Stashed changes
         </SidebarFooter>
       </Sidebar>
     </aside>

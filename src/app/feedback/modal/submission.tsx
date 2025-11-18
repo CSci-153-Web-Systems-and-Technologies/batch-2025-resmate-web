@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { uploadPDFFile } from "@/utils/supabase/storage/client";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useState } from "react";
 
@@ -34,7 +35,18 @@ export function SubmitDraftModal({
     }
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    try {
+      const result = await uploadPDFFile({
+        file: file as File,
+        bucket: 'thesis-documents',
+        folder: 'drafts',
+        fileName: `${file?.name}.pdf`
+      })
+    } catch(error) {
+      console.error("File upload failed:", error);
+    }
+
     onSubmit?.({ recipient, title, file, message });
     setRecipient("");
     setTitle("");

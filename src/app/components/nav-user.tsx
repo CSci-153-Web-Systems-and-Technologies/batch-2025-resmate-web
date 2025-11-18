@@ -34,6 +34,7 @@ import { logout } from "@/app/auth/actions/auth"
 =======
 import { getCurrentUser, logout } from "@/lib/auth/actions/auth"
 >>>>>>> Stashed changes
+import { getCurrentUser, logout } from "@/lib/auth/actions/auth"
 import { useRouter } from "next/navigation"
 import { User } from "@/lib/model/user"
 
@@ -41,6 +42,9 @@ export function NavUser({
   user,
 }: {
 <<<<<<< Updated upstream
+<<<<<<< HEAD
+  user: User
+=======
   user: {
     name: string
     email: string
@@ -50,6 +54,7 @@ export function NavUser({
 =======
   user: User
 >>>>>>> Stashed changes
+>>>>>>> feature/frontend-implementation
 }) {
   const { isMobile } = useSidebar()
   const router = useRouter();

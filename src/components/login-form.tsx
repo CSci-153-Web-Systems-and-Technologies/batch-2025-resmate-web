@@ -20,6 +20,9 @@ import { login } from "../app/auth/actions/auth"
 import { login } from "../lib/auth/actions/auth"
 import { useState } from "react"
 import { useFormStatus } from "react-dom"
+import { login } from "../lib/auth/actions/auth"
+import { useState } from "react"
+import { useFormStatus } from "react-dom"
 
 function SubmitButton() {
   const { pending } = useFormStatus()
@@ -31,6 +34,16 @@ function SubmitButton() {
   )
 }
 >>>>>>> Stashed changes
+
+function SubmitButton() {
+  const { pending } = useFormStatus()
+  
+  return (
+    <Button type="submit" disabled={pending}>
+      {pending ? "Logging in..." : "Login"}
+    </Button>
+  )
+}
 
 export function LoginForm({
   className,

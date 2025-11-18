@@ -1,3 +1,5 @@
+import { getCurrentUser } from '@/lib/auth/actions/auth'
+import { getUserById } from '@/lib/db/user-db'
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
@@ -37,17 +39,40 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/register') &&
-    !request.nextUrl.pathname.startsWith('/auth') &&
-    !request.nextUrl.pathname.startsWith('/error')
-  ) {
+  const publicRoutes = ['/login', '/register', '/auth', '/error']
+  const isPublicRoute = publicRoutes.some((route) => request.nextUrl.pathname.startsWith(route))
+
+  if (!user && !isPublicRoute) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
+  }
+
+  if(user) {
+    const excludedRoutes = ['/setup', '/login', '/register', '/auth', '/error']
+    const isExcludedRoute = excludedRoutes.some((route) => request.nextUrl.pathname.startsWith(route))
+
+    if(!isExcludedRoute) {
+      const currentUser = await getUserById(user.id)
+
+      const isProfileIncomplete = 
+        !currentUser || 
+        !currentUser.firstName || 
+        !currentUser.lastName || 
+        !currentUser.role || 
+        !currentUser.department ||
+        currentUser.firstName.trim() === '' || 
+        currentUser.lastName.trim() === '' ||
+        currentUser.role.trim() === '' ||
+        currentUser.department.trim() === ''
+
+      if (isProfileIncomplete) {
+        const url = request.nextUrl.clone()
+        url.pathname = '/setup'
+        return NextResponse.redirect(url)
+      }
+    }
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.

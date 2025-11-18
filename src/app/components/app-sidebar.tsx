@@ -1,17 +1,26 @@
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, useSidebar } from "@/components/ui/sidebar";
 import { Home, MessageSquare } from "lucide-react";
 import { NavUser } from "./nav-user";
+import { useEffect, useState } from "react";
+import { User } from "@/lib/model/user";
+import { getCurrentUser } from "@/lib/auth/actions/auth";
 
 type Props = { className?: string };
 
 export function AppSidebar({ className }: Props) {
-  const data = {
-    user: {
-      name: "John Doe",
-      email: "john.doe@example.com",
-      avatar: "https://i.pravatar.cc/150?img=3",
-    },
-    items: [
+  const [user, setUser] = useState<User | null>(null);
+  const [loading , setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadUser() {
+      const currentUser = await getCurrentUser()
+      setUser(currentUser);
+      setLoading(false);
+    }
+    loadUser();
+  }, [])
+
+  const items = [
       {
         title: 'Dashboard',
         url: '/',
@@ -23,7 +32,7 @@ export function AppSidebar({ className }: Props) {
         icon: MessageSquare,
       }
     ]
-  }
+  
 
   return (
     <aside className={`sticky top-[7rem] h-[calc(100vh-7rem)] overflow-auto ${className ?? "" }`}>
@@ -41,7 +50,7 @@ export function AppSidebar({ className }: Props) {
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
-                {data.items.map((item) => (
+                {items.map((item) => (
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton asChild>
                       <a href={item.url}>
@@ -56,7 +65,7 @@ export function AppSidebar({ className }: Props) {
           </SidebarGroup>
         </SidebarContent> 
         <SidebarFooter>
-          <NavUser user={data.user} />
+          {!loading && user && <NavUser user={user} />}
         </SidebarFooter>
       </Sidebar>
     </aside>

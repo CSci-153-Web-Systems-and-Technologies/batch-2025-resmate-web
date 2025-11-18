@@ -15,12 +15,41 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { login } from "../lib/auth/actions/auth"
+import { useState } from "react"
+import { useFormStatus } from "react-dom"
+
+function SubmitButton() {
+  const { pending } = useFormStatus()
+  
+  return (
+    <Button type="submit" disabled={pending}>
+      {pending ? "Logging in..." : "Login"}
+    </Button>
+  )
+}
 
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const [error, setError] = useState<string | null>(null);
 
+  const handleSubmit = async (formData: FormData) => {
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
+
+    if(!email || !password || email.trim() === '' || password.trim() === '') {
+      setError('Email and password are required.');
+      return;
+    }
+    setError(null);
+    const result = await login(formData);
+
+    if(result instanceof Error) {
+      setError(result.message);
+    }
+    
+  }
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -32,7 +61,7 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form action={handleSubmit}>
             <FieldGroup>
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -57,7 +86,7 @@ export function LoginForm({
                 <Input id="password" name="password" type="password" required />
               </Field>
               <Field>
-                <Button type="submit" formAction={login}>Login</Button>
+                <SubmitButton />
                 <Button variant="outline" type="button">
                   Login with Google
                 </Button>

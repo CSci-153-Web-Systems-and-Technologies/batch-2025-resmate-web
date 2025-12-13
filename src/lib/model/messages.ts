@@ -1,9 +1,9 @@
 export type ChatMessage = {
   message_id?: string;
-  conversation_id: string;
+  version_id: string;
   sender_id: string;
   message: string;
-  createdAt?: string | number;
+  created_at?: string;
 }
 
 export type Conversation = {
@@ -18,21 +18,17 @@ export type ConversationParticipant = {
 }
 
 export type DraftSubmission = {
-  submission_id?: string;
+  draft_id?: string;
   conversation_id: string;
-  student_id: string;
-  adviser_id: string;
   draft_title: string;
-  draft_file_url: string;
-  draft_file_name: string;
-  status?: string;
   created_at?: string;
 }
 
 export type VersionFeedback = {
-  feedback_id?: string;
-  submission_id: string;
+  version_id?: string;
+  draft_id?: string;
   file_url: string;
   file_name: string;
+  isClosed?: boolean;
   created_at?: string;
 }

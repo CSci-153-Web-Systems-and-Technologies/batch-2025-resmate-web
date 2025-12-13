@@ -1,17 +1,15 @@
 'use server';
 
 import { createClient } from "@/utils/supabase/server";
-// import { createClient } from "@/utils/supabase/server";
 import { ChatMessage, Conversation, DraftSubmission, VersionFeedback } from "../model/messages";
 import { User } from "../model/user";
 import { getUserById } from "./user-db";
-import { version } from "os";
 
 export async function closeOlderVersionsForDraft(draftId: string): Promise<void> {
   const supabase = await createClient();
 
   // Get all versions for this draft, sorted by created_at desc (latest first)
-  const { data: versions, error: fetchErr } = await supabase
+  const { error: fetchErr } = await supabase
     .from('version_feedback')
     .update({ is_closed: true })
     .eq('draft_id', draftId)

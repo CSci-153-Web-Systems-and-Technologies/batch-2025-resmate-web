@@ -5,7 +5,6 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Field, FieldGroup, FieldLabel } from "./ui/field";
 import { Input } from "./ui/input";
-import { useState } from "react";
 import { completeUserProfile } from "@/lib/auth/actions/auth";
 
 function SubmitButton() {

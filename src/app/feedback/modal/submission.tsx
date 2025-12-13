@@ -9,13 +9,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { getCurrentUser } from "@/lib/auth/actions/auth";
 import { closeOlderVersionsForDraft, createConversation, createDraftSubmission, createVersionFeedback, getConversationByParticipants, sendMessage } from "@/lib/db/message-db";
 import { searchAdvisersByName } from "@/lib/db/user-db";
-import { ChatMessage, Conversation, DraftSubmission } from "@/lib/model/messages";
+import { DraftSubmission } from "@/lib/model/messages";
 import { User } from "@/lib/model/user";
 import { cn } from "@/lib/utils";
 import { uploadPDFFile } from "@/utils/supabase/storage/file-upload";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { CommandInput } from "cmdk";
-import { is } from "date-fns/locale";
 import { Check, ChevronsUpDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -115,7 +114,6 @@ export function SubmitDraftModal({
     }
 
     const isNewSubmission = !draft;
-    const isModifiedSubmission = !!draft;
 
     // Validate per branch
     if (isNewSubmission) {

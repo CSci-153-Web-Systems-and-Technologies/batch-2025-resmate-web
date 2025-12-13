@@ -1,15 +1,15 @@
 'use client';
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Bell, Upload } from "lucide-react";
+import { ArrowLeft, Bell } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { ContactPerson } from "./components/contact-person";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 import { getCurrentUser } from "@/lib/auth/actions/auth";
 import { User } from "@/lib/model/user";
-import { Conversation, DraftSubmission, VersionFeedback } from "@/lib/model/messages";
-import { getConversations, getDraftSubmissions, getUserParticipants, getVersionFeedbacks, sendMessage } from "@/lib/db/message-db";
+import { Conversation, DraftSubmission } from "@/lib/model/messages";
+import { getConversations, getDraftSubmissions, getUserParticipants } from "@/lib/db/message-db";
 import { ContactList } from "./components/contact-list";
 import { DraftArea } from "./components/draft-area";
 import { DraftSelectorDialog } from "./modal/draft-selector";
@@ -83,8 +83,6 @@ export default function FeedbackPage({
 
         setSelectedDraft(latest);
 
-        // const versions = await getVersionFeedbacks(latest.draft_id as string);
-        // setThreadVersions(versions);
       } catch (error) {
         console.error("Error loading draft submissions:", error);
         setSelectedDraft(null);
@@ -142,38 +140,6 @@ export default function FeedbackPage({
 
     loadConversations();
   }, [currentUser]);
-
-  
-
-  const handleSubmitDraft = async (data: {
-    recipient: string;
-    title: string;
-    file: File | null;
-    message: string;
-  }) => {
-    console.log("Draft submitted:", data);
-    if (currentUser) {
-      getConversations(currentUser.userId).then((data) => {
-        const mappedConversations: Conversation[] = data.map((item: any) => ({
-          conversation_id: item.conversation_id,
-          other_user: {
-            id: item.other_user_id,
-            firstName: item.other_user_firstName,
-            lastName: item.other_user_lastName,
-            role: item.other_user_role,
-          },
-          last_message: item.last_message,
-          last_message_time: item.last_message_time,
-        }));
-
-
-        setConversations(mappedConversations);
-      });
-
-      const conv = await getConversations(currentUser.userId);
-      setConversations(conv);
-    }
-  };
 
   const selectedConversationData = conversations.find(
     (c) => c.conversation_id === selectedConversation
@@ -302,7 +268,6 @@ export default function FeedbackPage({
               {selectedDraft ? (
                 <DraftArea
                   draft={selectedDraft}
-                  latestIndex={0} 
                 />
               ) : (
                 <div className="flex-1 flex items-center justify-center text-gray-400">

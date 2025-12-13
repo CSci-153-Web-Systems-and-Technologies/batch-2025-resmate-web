@@ -55,6 +55,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
     try {
       await signup(formData);
     } catch (err) {
+      console.error("Signup error:", err);
       setError("An error occurred during signup. Please try again.");
     }
   }

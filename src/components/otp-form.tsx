@@ -1,3 +1,4 @@
+'use client'
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -16,9 +17,12 @@ import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-} from "@/components/ui/input-otp"
+} from "@/components/ui/input-otp";
+import { useRouter } from "next/navigation";
 
 export function OTPForm({ ...props }: React.ComponentProps<typeof Card>) {
+  const router = useRouter();
+
   return (
     <Card {...props}>
       <CardHeader>
@@ -46,6 +50,8 @@ export function OTPForm({ ...props }: React.ComponentProps<typeof Card>) {
             </Field>
             <FieldGroup>
               <Button type="submit">Verify</Button>
+
+              <Button variant="secondary" type="button" onClick={() => router.push('/login')}>Back to Login</Button>
               <FieldDescription className="text-center">
                 Didn&apos;t receive the code? <a href="#">Resend</a>
               </FieldDescription>

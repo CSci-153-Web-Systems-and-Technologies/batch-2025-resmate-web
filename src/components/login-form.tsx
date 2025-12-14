@@ -14,9 +14,9 @@ import {
   FieldLabel,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { login } from "../lib/auth/actions/auth"
-import { useState } from "react"
 import { useFormStatus } from "react-dom"
+import { login } from "@/lib/auth/actions/auth"
+
 
 function SubmitButton() {
   const { pending } = useFormStatus()
@@ -32,21 +32,18 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (formData: FormData) => {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
     if(!email || !password || email.trim() === '' || password.trim() === '') {
-      setError('Email and password are required.');
       return;
     }
-    setError(null);
     const result = await login(formData);
 
     if(result instanceof Error) {
-      setError(result.message);
+      console.error("Login failed:", result.message);
     }
     
   }

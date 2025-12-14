@@ -29,23 +29,14 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { getCurrentUser, logout } from "@/lib/auth/actions/auth"
+import { logout } from "@/lib/auth/actions/auth"
 import { useRouter } from "next/navigation"
 import { User } from "@/lib/model/user"
 
-export function NavUser({
+export function NavUser({   
   user,
 }: {
-<<<<<<< HEAD
   user: User
-=======
-  user: {
-    name: string
-    email: string
-    avatar: string
-  },
-
->>>>>>> feature/frontend-implementation
 }) {
   const { isMobile } = useSidebar()
   const router = useRouter();

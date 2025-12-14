@@ -5,7 +5,6 @@ import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
 import { Field, FieldGroup, FieldLabel } from "./ui/field";
 import { Input } from "./ui/input";
-import { useState } from "react";
 import { completeUserProfile } from "@/lib/auth/actions/auth";
 
 function SubmitButton() {
@@ -18,7 +17,6 @@ function SubmitButton() {
 }
 
 export function AccountSetupForm({ ...props }: React.ComponentProps<typeof Card>) {
-  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (formData: FormData) => {
     const firstName = formData.get('firstname') as string;
@@ -27,16 +25,13 @@ export function AccountSetupForm({ ...props }: React.ComponentProps<typeof Card>
     const department = formData.get('department') as string;
 
     if(!firstName || !lastName || !role || !department || firstName.trim() === '' || lastName.trim() === '' || role.trim() === '' || department.trim() === '') {
-      setError('All fields are required.');
       return;
     }
-
-    setError(null);
 
     const result = await completeUserProfile(formData);
 
     if(result?.error) {
-      setError(result.error);
+      console.error('Error completing user profile:', result.error);
     }
   }
   

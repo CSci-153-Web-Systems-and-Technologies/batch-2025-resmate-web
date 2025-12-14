@@ -7,12 +7,18 @@ type UploadPDFFile = {
   fileName?: string;
 }
 
+type UploadResult = {
+  path: string;
+  fullPath: string;
+  publicUrl: string;
+}
+
 export async function uploadPDFFile({
   file,
   bucket,
   folder,
   fileName,
-}: UploadPDFFile) {
+}: UploadPDFFile): Promise<UploadResult> {
   const supabase = createClient()
 
   const timestamp = Date.now();
@@ -29,4 +35,15 @@ export async function uploadPDFFile({
     console.error('Error uploading file:', error);
     throw new Error(error.message);
   }
+
+  // Get public URL for the uploaded file
+  const { data: { publicUrl } } = supabase.storage
+    .from(bucket)
+    .getPublicUrl(data.path);
+  
+  return {
+    path: data.path,
+    fullPath: data.fullPath,
+    publicUrl: publicUrl
+  };
 }

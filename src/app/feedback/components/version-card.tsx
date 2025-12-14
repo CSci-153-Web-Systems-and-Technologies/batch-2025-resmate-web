@@ -4,7 +4,7 @@ import { ChatMessage, VersionFeedback } from "@/lib/model/messages";
 import { FileText, MessageSquare } from "lucide-react";
 import { useEffect, useState } from "react";
 import { MessageBox } from "./message-box";
-import { getMessagesByVersion, sendMessage } from "@/lib/db/message-db";
+import { sendMessage } from "@/lib/db/message-db";
 import { User } from "@/lib/model/user";
 import { getCurrentUser } from "@/lib/auth/actions/auth";
 import { useRealtimeMessages } from "@/hooks/realtime-chat";

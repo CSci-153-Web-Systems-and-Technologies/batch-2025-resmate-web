@@ -1,10 +1,9 @@
 'use client';
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import "./globals.css";
 import { usePathname } from "next/navigation";
 import { AppSidebar } from "./components/app-sidebar";
 import { SiteHeader } from "./components/site-header";
-import App from "next/app";
 
 export default function RootLayout({
   children,
@@ -12,8 +11,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-
-  const isFeedbackPage = pathname.startsWith("/feedback");
 
   const isAuthRoute = pathname.startsWith("/login") || pathname.startsWith("/register") || pathname.startsWith("/setup") || pathname.startsWith("/otp");
 
@@ -27,14 +24,18 @@ export default function RootLayout({
     );
   }
 
+  const routeTitleMap: Record<string, string> = {
+    '/': 'Dashboard',
+    '/feedback': 'Feedback',
+  };
+
   return (
     <html lang="en">
-      <body className="bg-amber-100">
+      <body className="bg-white">
         <SidebarProvider>
           <AppSidebar />
           <SidebarInset>
-            <SiteHeader />
-
+            <SiteHeader page={routeTitleMap[pathname]} />
             <div className="flex flex-1 flex-col">
               <div className="@container/main flex flex-1 flex-col gap-2">
                 <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">

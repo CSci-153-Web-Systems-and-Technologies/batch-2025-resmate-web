@@ -10,20 +10,19 @@ import React, { useEffect, useState } from "react";
 export default function HomePage() {
 
   const [user, setUser] = useState<User | null>(null);
-  const [loading , setLoading] = useState(true);
 
   useEffect(() => {
     async function loadUser() {
       const currentUser = await getCurrentUser();
       setUser(currentUser);
-      setLoading(false);
     }
     loadUser();
   }, []);
 
   return (
-    <div className="space-y-4">
-      <div className="bg-white p-4 rounded-md">
+    <div className="flex items-center justify-center">
+      <h1> Dashboard Page</h1>
+      {/* <div className="bg-white p-4 rounded-md">
         <div>
           <h3>Development of Thesis Document Advising and Critique Review System</h3>
           <p>Primary Adviser: {user?.firstName} {user?.lastName}</p>
@@ -86,7 +85,7 @@ export default function HomePage() {
             // onSelect={setDate}
           />
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

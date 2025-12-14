@@ -1,8 +1,6 @@
-import { Textarea } from "@/components/ui/textarea";
+'use client';
 import { Button } from "@/components/ui/button";
-import { Send } from "lucide-react";
-import { ChatMessage, DraftSubmission, VersionFeedback } from "@/lib/model/messages";
-import { MessageBox } from "./message-box";
+import { DraftSubmission, VersionFeedback } from "@/lib/model/messages";
 import { useEffect, useState } from "react";
 import { getVersionFeedbacks } from "@/lib/db/message-db";
 import { VersionCard } from "./version-card";
@@ -10,12 +8,10 @@ import { SubmitDraftModal } from "../modal/submission";
 
 type DraftAreaProps = {
   draft: DraftSubmission | null;
-  latestIndex?: number;
 }
 
 export function DraftArea({
   draft,
-  latestIndex = 0,
 }: DraftAreaProps) {
   const [isOpenModal, setIsOpenModal] = useState(false);
 
@@ -50,7 +46,7 @@ export function DraftArea({
 
       {/* Version List */}
       <div className="flex-1 overflow-y-auto px-3 md:px-4 pb-6 space-y-6">
-        {versions.map((version, idx) => {
+        {versions.map((version) => {
 
           return (
             <VersionCard

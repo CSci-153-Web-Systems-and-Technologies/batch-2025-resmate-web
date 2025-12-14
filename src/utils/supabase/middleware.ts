@@ -38,8 +38,14 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  const pathname = request.nextUrl.pathname
+  const emailParam = request.nextUrl.searchParams.get('email')
+
   const publicRoutes = ['/login', '/register', '/error']
-  const isPublicRoute = publicRoutes.some((route) => request.nextUrl.pathname.startsWith(route))
+
+  const isOtpRoute = pathname.startsWith('/otp')
+
+  const isPublicRoute = publicRoutes.some((route) => request.nextUrl.pathname.startsWith(route)) || (isOtpRoute && !!emailParam && emailParam.trim() !== '')
 
    // If user is authenticated and trying to access login/register, redirect to home
   if (user && isPublicRoute) {
@@ -60,11 +66,7 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone()
     
     // If profile incomplete, redirect to setup, otherwise to dashboard
-    if (isProfileIncomplete) {
-      url.pathname = '/setup'
-    } else {
-      url.pathname = '/'
-    }
+    url.pathname = isProfileIncomplete ? '/setup' : '/'
     
     return NextResponse.redirect(url)
   }
@@ -79,7 +81,7 @@ export async function updateSession(request: NextRequest) {
   // If user exists, check profile completion for protected routes
   if(user) {
     const excludedRoutes = ['/setup', '/login', '/register', '/auth', '/error']
-    const isExcludedRoute = excludedRoutes.some((route) => request.nextUrl.pathname.startsWith(route))
+    const isExcludedRoute = excludedRoutes.some((route) => request.nextUrl.pathname.startsWith(route)) || (isOtpRoute && !!emailParam && emailParam.trim() !== '')
 
     if(!isExcludedRoute) {
       const currentUser = await getUserById(user.id)

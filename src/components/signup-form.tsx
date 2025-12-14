@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import { useFormStatus } from "react-dom"
+import { redirect, useRouter } from "next/navigation"
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -30,21 +31,21 @@ function SubmitButton() {
 }
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
-
+  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [passwordMatch, setPasswordMatch] = useState(true);
 
-  const handleSubmit = async (formData: FormData) => {
+  async function validateAndSubmit(formData: FormData) {
+    const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const confirmPassword = formData.get("confirm-password") as string;
 
-    if(password !== confirmPassword) {
+    if (password !== confirmPassword) {
       setPasswordMatch(false);
       setError("Passwords do not match.");
       return;
     }
-
-    if(password.length < 8) {
+    if (password.length < 8) {
       setError("Password must be at least 8 characters long.");
       return;
     }
@@ -52,12 +53,9 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
     setPasswordMatch(true);
     setError(null);
 
-    try {
-      await signup(formData);
-    } catch (err) {
-      console.error("Signup error:", err);
-      setError("An error occurred during signup. Please try again.");
-    }
+    // Delegate to server action for actual signup + redirect
+    await signup(formData);
+    // No client-side push here; server action handles redirect
   }
 
   return (
@@ -69,7 +67,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={handleSubmit}>
+        <form action={validateAndSubmit} className="space-y-6">
           <FieldGroup>
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4 text-sm">

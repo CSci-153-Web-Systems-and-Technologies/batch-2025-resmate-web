@@ -21,18 +21,17 @@ export function AppSidebar({ className }: Props) {
   }, [])
 
   const items = [
-      {
-        title: 'Dashboard',
-        url: '/',
-        icon: Home,
-      },
-      {
-        title: 'Feedback',
-        url: '/feedback',
-        icon: MessageSquare,
-      }
-    ]
-  
+    {
+      title: 'Dashboard',
+      url: '/',
+      icon: Home,
+    },
+    {
+      title: 'Feedback',
+      url: '/feedback',
+      icon: MessageSquare,
+    }
+  ];  
 
   return (
     <aside className={`sticky top-[7rem] h-[calc(100vh-7rem)] overflow-auto ${className ?? "" }`}>
@@ -42,7 +41,7 @@ export function AppSidebar({ className }: Props) {
             <div className="bg-blue-600 text-white w-8 h-8 rounded flex items-center justify-center font-bold">
               Logo
             </div>
-            <h4 className="font-semibold text-lg">ResMate</h4>
+            <h4 className="font-semibold text-lg text-white">ResMate</h4>
           </div>
         </SidebarHeader>
 
@@ -64,7 +63,7 @@ export function AppSidebar({ className }: Props) {
             </SidebarGroupContent>
           </SidebarGroup>
         </SidebarContent> 
-        <SidebarFooter>
+        <SidebarFooter className="bg-black">
           {!loading && user && <NavUser user={user} />}
         </SidebarFooter>
       </Sidebar>

@@ -1,4 +1,3 @@
-import { getCurrentUser } from '@/lib/auth/actions/auth'
 import { getUserById } from '@/lib/db/user-db'
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
@@ -10,7 +9,7 @@ export async function updateSession(request: NextRequest) {
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_OR_ANON_KEY!,
     {
       cookies: {
         getAll() {
@@ -39,8 +38,36 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  const publicRoutes = ['/login', '/register', '/auth', '/error']
+  const publicRoutes = ['/login', '/register', '/error']
   const isPublicRoute = publicRoutes.some((route) => request.nextUrl.pathname.startsWith(route))
+
+   // If user is authenticated and trying to access login/register, redirect to home
+  if (user && isPublicRoute) {
+    const currentUser = await getUserById(user.id)
+    
+    // Check if profile is incomplete
+    const isProfileIncomplete = 
+      !currentUser || 
+      !currentUser.firstName || 
+      !currentUser.lastName || 
+      !currentUser.role || 
+      !currentUser.department ||
+      currentUser.firstName.trim() === '' || 
+      currentUser.lastName.trim() === '' ||
+      currentUser.role.trim() === '' ||
+      currentUser.department.trim() === ''
+
+    const url = request.nextUrl.clone()
+    
+    // If profile incomplete, redirect to setup, otherwise to dashboard
+    if (isProfileIncomplete) {
+      url.pathname = '/setup'
+    } else {
+      url.pathname = '/'
+    }
+    
+    return NextResponse.redirect(url)
+  }
 
   if (!user && !isPublicRoute) {
     // no user, potentially respond by redirecting the user to the login page
@@ -49,6 +76,7 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
+  // If user exists, check profile completion for protected routes
   if(user) {
     const excludedRoutes = ['/setup', '/login', '/register', '/auth', '/error']
     const isExcludedRoute = excludedRoutes.some((route) => request.nextUrl.pathname.startsWith(route))

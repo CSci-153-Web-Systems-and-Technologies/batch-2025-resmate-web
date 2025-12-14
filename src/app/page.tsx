@@ -10,13 +10,11 @@ import React, { useEffect, useState } from "react";
 export default function HomePage() {
 
   const [user, setUser] = useState<User | null>(null);
-  const [loading , setLoading] = useState(true);
 
   useEffect(() => {
     async function loadUser() {
       const currentUser = await getCurrentUser();
       setUser(currentUser);
-      setLoading(false);
     }
     loadUser();
   }, []);

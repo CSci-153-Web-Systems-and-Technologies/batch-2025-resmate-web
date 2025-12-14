@@ -140,29 +140,3 @@ export async function createUser(user: User): Promise<void> {
     throw error;
   }
 }
-
-
-export async function updateUser(userId: string, updates: Partial<User>) {
-  const supabase = await createClient();
-
-  const dbUpdates: any = {}
-  if (updates.firstName !== undefined) dbUpdates.first_name = updates.firstName
-  if (updates.lastName !== undefined) dbUpdates.last_name = updates.lastName
-  if (updates.email !== undefined) dbUpdates.email = updates.email
-  if (updates.role !== undefined) dbUpdates.role = updates.role
-  if (updates.department !== undefined) dbUpdates.department = updates.department
-
-  const { error } = await supabase
-    .from('users')
-    .update(dbUpdates)
-    .eq('user_id', userId)
-
-  if (error) {
-    console.error('Error updating user:', error)
-    return { error: error.message }
-  }
-
-  return { success: true }
-}
-
-

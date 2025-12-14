@@ -5,7 +5,6 @@ import { Search, Upload } from "lucide-react";
 import { ContactPerson } from "./contact-person";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { Sub } from "@radix-ui/react-dropdown-menu";
 import { SubmitDraftModal } from "../modal/submission";
 
 type ContactListProps = {

@@ -101,8 +101,7 @@ export async function signup(formData: FormData) {
     redirect('/error')
   }
 
-  revalidatePath('/', 'layout')
-  redirect('/')
+  redirect(`/otp?email=${encodeURIComponent(data.email)}`);
 }
 
 

@@ -29,7 +29,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-import { getCurrentUser, logout } from "@/lib/auth/actions/auth"
+import { logout } from "@/lib/auth/actions/auth"
 import { useRouter } from "next/navigation"
 import { User } from "@/lib/model/user"
 

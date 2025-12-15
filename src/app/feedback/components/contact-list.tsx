@@ -8,6 +8,7 @@ import { useState } from "react";
 import { SubmitDraftModal } from "../modal/submission";
 
 type ContactListProps = {
+  user: User | null;
   conversations: Conversation[];
   otherParticipants: Map<string, User>;
   isLoadingConversations: boolean;
@@ -16,6 +17,7 @@ type ContactListProps = {
 }
 
 export function ContactList({
+  user,
   conversations,
   otherParticipants,
   isLoadingConversations,
@@ -66,12 +68,14 @@ export function ContactList({
         )}
       </div>
 
-      <div className="p-4 border-t">
-        <Button className="w-full" variant="default" onClick={() => setIsOpenModal(true)}>
-          <Upload className="h-4 w-4 mr-2" />
-          Submit New Draft
-        </Button>
-      </div>
+      {user?.role === "student" && (
+        <div className="p-4 border-t">
+          <Button className="w-full" variant="default" onClick={() => setIsOpenModal(true)}>
+            <Upload className="h-4 w-4 mr-2" />
+            Submit New Draft
+          </Button>
+        </div>
+      )}
 
       <SubmitDraftModal isOpen={isOpenModal} onOpenChange={setIsOpenModal} />
     </>

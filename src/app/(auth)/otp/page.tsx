@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense, useEffect } from "react"
 
-function OTPPageContent() {
+ function OTPContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const email = searchParams.get("email")
@@ -32,7 +32,7 @@ function OTPPageContent() {
 export default function OTPPage() {
   return (
     <Suspense fallback={<Skeleton />}>
-      <OTPPageContent />
+      <OTPContent />
     </Suspense>
   )
 }

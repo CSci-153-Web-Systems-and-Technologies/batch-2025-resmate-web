@@ -30,7 +30,6 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { logout } from "@/lib/auth/actions/auth"
-import { useRouter } from "next/navigation"
 import { User } from "@/lib/model/user"
 
 export function NavUser({   
@@ -39,11 +38,9 @@ export function NavUser({
   user: User
 }) {
   const { isMobile } = useSidebar()
-  const router = useRouter();
 
   const handleSignOut = async () => {
     await logout();
-    router.push("/login");
   };
   const avatar = "https://i.pravatar.cc/150?img=3"
 
@@ -54,14 +51,14 @@ export function NavUser({
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger asChild className="bg-black">
             <SidebarMenuButton
               size="lg"
               className="text-white data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={avatar} alt={userInitials} />
-                <AvatarFallback className="rounded-lg">{userInitials}</AvatarFallback>
+                <AvatarFallback className="rounded-lg bg-neutral-800 text-white">{userInitials}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{fullName}</span>

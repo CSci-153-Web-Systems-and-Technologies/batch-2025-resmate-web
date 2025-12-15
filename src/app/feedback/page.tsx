@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 
 import { getCurrentUser } from "@/lib/auth/actions/auth";
 import { User } from "@/lib/model/user";
-import { ChatMessage, Conversation, DraftSubmission, VersionFeedback } from "@/lib/model/messages";
+import { Conversation, DraftSubmission } from "@/lib/model/messages";
 import { getConversations, getDraftSubmissions, getUserParticipants } from "@/lib/db/message-db";
 import { ContactList } from "./components/contact-list";
 import { DraftArea } from "./components/draft-area";
@@ -19,9 +19,7 @@ export default function FeedbackPage({
 } : { initialConversationId: string }) {
   const router = useRouter()
 
-
   const [selectedConversation, setSelectedConversation] = useState<string | null>(initialConversationId ?? null);
-
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null)
@@ -171,6 +169,7 @@ export default function FeedbackPage({
         {/* Desktop Sidebar - Hidden on mobile */}
         <div className="hidden md:flex w-80 bg-white flex-col border-r flex-shrink-0">
           <ContactList
+            user={currentUser}
             conversations={conversations}
             otherParticipants={otherParticipants}
             isLoadingConversations={isLoadingConversations}

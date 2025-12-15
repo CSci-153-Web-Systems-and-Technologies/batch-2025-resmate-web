@@ -5,6 +5,133 @@ import { ChatMessage, Conversation, DraftSubmission, VersionFeedback } from "../
 import { User } from "../model/user";
 import { getUserById } from "./user-db";
 
+// ...existing code...
+
+function withTimeout<T>(p: Promise<T>, ms: number, fallback: T): Promise<T> {
+  return new Promise((resolve) => {
+    const t = setTimeout(() => resolve(fallback), ms);
+    p.then((v) => { clearTimeout(t); resolve(v); })
+     .catch(() => { clearTimeout(t); resolve(fallback); });
+  });
+}
+
+export async function loadConversationBundle(conversationId: string, currentUserId: string, timeoutMs = 5000) {
+  const supabase = await createClient();
+
+  const draftsP = supabase
+    .from('draft_submissions')
+    .select('draft_id, conversation_id, title, created_at')
+    .eq('conversation_id', conversationId)
+    .order('created_at', { ascending: true })
+    .then(({ data, error }) => {
+      if (error) { 
+        console.error(error); 
+        return [] as DraftSubmission[]; 
+      }
+      return (data ?? []).map(d => ({
+        draft_id: d.draft_id,
+        conversation_id: d.conversation_id,
+        draft_title: d.title,
+        created_at: d.created_at,
+      } as DraftSubmission));
+    });
+
+  const otherParticipantP = supabase
+    .from('conversation_participants')
+    .select('user_id')
+    .eq('conversation_id', conversationId)
+    .neq('user_id', currentUserId)
+    .limit(1)
+    .then(async ({ data, error }) => {
+      if (error) { console.error(error); return null as User | null; }
+      const otherId = data?.[0]?.user_id;
+      if (!otherId) return null;
+      const { data: u, error: uErr } = await supabase
+        .from('users')
+        .select('user_id, first_name, last_name')
+        .eq('user_id', otherId)
+        .limit(1)
+        .single();
+      if (uErr || !u) return null;
+      return { userId: u.user_id, firstName: u.first_name, lastName: u.last_name } as User;
+    });
+
+  const versionsAndMessagesP = draftsP.then(async (drafts) => {
+    const versionsByDraft = new Map<string, VersionFeedback[]>();
+    let latestMessages: ChatMessage[] = [];
+
+    if (drafts.length) {
+      await Promise.all(drafts.map(async (d) => {
+        const { data, error } = await supabase
+          .from('version_feedback')
+          .select('version_id, draft_id, file_url, file_name, is_closed, created_at')
+          .eq('draft_id', d.draft_id)
+          .order('created_at', { ascending: true });
+        if (!d.draft_id) {
+          console.error("Draft ID is undefined:", d);
+          return;
+        }
+        if (error) { console.error(error); versionsByDraft.set(d.draft_id as string, []); return; }
+        const v = (data ?? []).map(x => ({
+          version_id: x.version_id,
+          draft_id: x.draft_id,
+          file_url: x.file_url,
+          file_name: x.file_name,
+          isClosed: x.is_closed,
+          created_at: x.created_at,
+        } as VersionFeedback));
+        versionsByDraft.set(d.draft_id as string, v);
+      }));
+
+      const latestDraft = drafts.at(-1);
+      let latestVersion: VersionFeedback | undefined = undefined;
+      if (latestDraft && latestDraft.draft_id) {
+        latestVersion = versionsByDraft.get(latestDraft.draft_id)?.at(-1);
+      }
+      if (latestVersion) {
+        const { data, error } = await supabase
+          .from('messages')
+          .select('message_id, version_id, sender_id, message, created_at')
+          .eq('version_id', latestVersion.version_id)
+          .order('created_at', { ascending: true });
+        if (!error) {
+          latestMessages = (data ?? []).map(m => ({
+            message_id: m.message_id,
+            version_id: m.version_id,
+            sender_id: m.sender_id,
+            message: m.message,
+            created_at: m.created_at,
+          } as ChatMessage));
+        }
+      }
+    }
+
+    return { versionsByDraft, latestMessages };
+  });
+
+  const fallback = {
+    drafts: [] as DraftSubmission[],
+    otherParticipant: null as User | null,
+    versionsByDraft: new Map<string, VersionFeedback[]>(),
+    latestMessages: [] as ChatMessage[],
+  };
+
+  const [drafts, otherParticipant, vm] = await withTimeout(
+    Promise.all([draftsP, otherParticipantP, versionsAndMessagesP]),
+    timeoutMs,
+    [fallback.drafts, fallback.otherParticipant, { versionsByDraft: fallback.versionsByDraft, latestMessages: fallback.latestMessages }]
+  );
+
+  return {
+    drafts,
+    otherParticipant,
+    versionsByDraft: vm.versionsByDraft,
+    latestMessages: vm.latestMessages,
+  };
+}
+
+// ...existing code...
+
 export async function closeOlderVersionsForDraft(draftId: string): Promise<void> {
   const supabase = await createClient();
 

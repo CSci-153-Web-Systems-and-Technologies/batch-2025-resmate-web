@@ -1,9 +1,10 @@
 'use client'
 import { OTPForm } from "@/components/otp-form"
+import { Skeleton } from "@/components/ui/skeleton"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useEffect } from "react"
+import { Suspense, useEffect } from "react"
 
-export default function OTPPage() {
+ function OTPContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const email = searchParams.get("email")
@@ -25,5 +26,13 @@ export default function OTPPage() {
         <OTPForm />
       </div>
     </div>
+  )
+}
+
+export default function OTPPage() {
+  return (
+    <Suspense fallback={<Skeleton />}>
+      <OTPContent />
+    </Suspense>
   )
 }

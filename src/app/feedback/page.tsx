@@ -14,13 +14,10 @@ import { ContactList } from "./components/contact-list";
 import { DraftArea } from "./components/draft-area";
 import { DraftSelectorDialog } from "./modal/draft-selector";
 
-
 export default function FeedbackPage({
-  initialConversationId,
-}: { initialConversationId?: string }) {
-  const router = useRouter();
-  // const searchParams = useSearchParams();
-  // const conversationId = searchParams.get("conversation");
+  initialConversationId
+} : { initialConversationId: string }) {
+  const router = useRouter()
 
 
   const [selectedConversation, setSelectedConversation] = useState<string | null>(initialConversationId ?? null);

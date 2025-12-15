@@ -29,39 +29,18 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
-<<<<<<< Updated upstream
-import { logout } from "@/app/auth/actions/auth"
-=======
-import { getCurrentUser, logout } from "@/lib/auth/actions/auth"
->>>>>>> Stashed changes
-import { getCurrentUser, logout } from "@/lib/auth/actions/auth"
-import { useRouter } from "next/navigation"
+import { logout } from "@/lib/auth/actions/auth"
 import { User } from "@/lib/model/user"
 
-export function NavUser({
+export function NavUser({   
   user,
 }: {
-<<<<<<< Updated upstream
-<<<<<<< HEAD
   user: User
-=======
-  user: {
-    name: string
-    email: string
-    avatar: string
-  },
-
-=======
-  user: User
->>>>>>> Stashed changes
->>>>>>> feature/frontend-implementation
 }) {
   const { isMobile } = useSidebar()
-  const router = useRouter();
 
   const handleSignOut = async () => {
     await logout();
-    router.push("/login");
   };
   const avatar = "https://i.pravatar.cc/150?img=3"
 
@@ -72,14 +51,14 @@ export function NavUser({
     <SidebarMenu>
       <SidebarMenuItem>
         <DropdownMenu>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger asChild className="bg-black">
             <SidebarMenuButton
               size="lg"
               className="text-white data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
                 <AvatarImage src={avatar} alt={userInitials} />
-                <AvatarFallback className="rounded-lg">{userInitials}</AvatarFallback>
+                <AvatarFallback className="rounded-lg bg-neutral-800 text-white">{userInitials}</AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{fullName}</span>

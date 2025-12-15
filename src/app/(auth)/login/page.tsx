@@ -1,10 +1,8 @@
 "use client";
 
 import { LoginForm } from "@/components/login-form";
-import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-  const router = useRouter();
 
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">

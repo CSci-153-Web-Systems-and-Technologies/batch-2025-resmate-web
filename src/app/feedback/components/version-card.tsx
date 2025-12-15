@@ -1,65 +1,126 @@
-import { PaperclipIcon } from "lucide-react";
-import { Version } from "../messages";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { ChatMessage, VersionFeedback } from "@/lib/model/messages";
+import { FileText, MessageSquare } from "lucide-react";
+import { useEffect, useState } from "react";
+import { MessageBox } from "./message-box";
+import { sendMessage } from "@/lib/db/message-db";
+import { User } from "@/lib/model/user";
+import { getCurrentUser } from "@/lib/auth/actions/auth";
+import { useRealtimeMessages } from "@/hooks/realtime-chat";
 
-function FileTag ({ name }: { name: string }) {
-  return (
-    <div className="inline-flex items-center gap-2 rounded-full bg-slate-200 text-slate-700 text-xs px-3 py-1">
-      <PaperclipIcon className="h-4 w-4" />
-      <span className="truncate max-w-[200px]">{name}</span>
-    </div>
-  );
-}
+type VersionCardProps = {
+  version: VersionFeedback;
+};
 
-export default function VersionCard ({ version }: { version: Version }) {
+export function VersionCard({
+  version,
+}: VersionCardProps) {
+  const [newMessage, setNewMessage] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+
+  const realtimeMessages = useRealtimeMessages(version.version_id!);
+
+  useEffect(() => {
+    const getUser = async () => {
+      // Placeholder for getting current user logic
+      const user: User | null = await getCurrentUser();
+      setCurrentUser(user);
+    }
+    getUser();
+  }, []);
+
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim()) return;
+    setIsSending(true);
+    try {
+      const messageToSend: ChatMessage = {
+        version_id: version.version_id!,
+        message: newMessage.trim(),
+        sender_id: currentUser?.userId || ""
+      };
+
+      await sendMessage(messageToSend);
+      setNewMessage("");
+    } catch (err) {
+      console.error("Failed to send message:", err);
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
+
   return (
-    <div className="bg-white border border-slate-200 rounded-xl shadow-card">
-      {/* Header row */}
-      <div className="flex items-start justify-between gap-3 px-4 pt-3">
-        <div className="flex items-center gap-3">
-          <FileTag name={version.fileName} />
-          <div className="text-xs text-slate-500">Version {version.number}</div>
+    <div className="border rounded-2xl p-4 md:p-6 bg-white shadow-sm mb-6">
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
+        <div className="flex items-center gap-3 bg-gray-100 rounded-lg px-4 py-3 flex-1">
+          <FileText className="h-5 w-5 text-gray-600" />
+          <span className="font-medium text-sm md:text-base">{version.file_name}</span>
         </div>
-        <div className="text-xs text-slate-500 text-right">
-          <div>{version.date}</div>
-          <div className={`${version.statusColor} font-medium`}>{version.status}</div>
+
+        <div className="flex items-center justify-between md:justify-end gap-4">
+
+          <span className={`text-sm md:text-base font-semibold ${"text-gray-700"}`}>
+            {new Date(version.created_at!).toLocaleDateString("en-US", {
+              month: "long",
+              day: "numeric", 
+              year: "numeric",
+            })}{" "}
+           
+          </span>
         </div>
       </div>
 
       {/* Messages */}
-      <div className="px-4 pb-4 pt-2 space-y-4">
-        {version.messages.map((msg, idx) => {
-          const isReviewer = msg.author.type === "reviewer";
+      <div className="space-y-3">
+        {realtimeMessages.map((message) => {
           return (
-            <div key={idx} className={`flex ${isReviewer ? "items-start gap-3" : "justify-end"}`}>
-              {isReviewer && (
-                <div className="h-8 w-8 rounded-full bg-slate-900 text-white text-[11px] flex items-center justify-center shrink-0">
-                  {msg.author.initials}
-                </div>
-              )}
-              <div
-                className={`max-w-[92%] md:max-w-[70%] rounded-2xl px-4 py-3 text-sm shadow-sm ${
-                  isReviewer ? "bg-slate-200 text-slate-800 rounded-tl-md"
-                   : "bg-brand-600 text-white rounded-tr-md"
-                }`}
-              >
-                <div className="whitespace-pre-wrap">{msg.text}</div>
-                <div className={`text-[11px] mt-2 ${isReviewer ? "text-slate-500" : "text-white/80"} text-right`}>
-                  {msg.timestamp}
-                </div>
-              </div>
-            </div>
-          );
+            <MessageBox key={message.message_id} message={message} senderId={message.sender_id} currentUserId={currentUser?.userId || ""} />
+          )
         })}
       </div>
 
-      {/* Footer status */}
-      {version.footer && (
-        <div className="px-4 pb-4">
-          <div className="bg-brand-600 text-white text-sm text-center rounded-lg px-3 py-2">
-            {version.footer}
-          </div>
+      {/* Message Input - Only for latest version and if not closed */}
+      {!version.isClosed ? (
+        <div className="mt-4 space-y-3">
+          <Textarea
+            placeholder="Type your message here."
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            onKeyDown={handleKeyPress}
+            className="min-h-[100px] resize-none"
+            disabled={isSending}
+          />
+          <Button
+            onClick={handleSendMessage}
+            disabled={!newMessage.trim() || isSending}
+            className="w-full md:w-auto"
+          >
+            <MessageSquare className="h-4 w-4 mr-2" />
+            {isSending ? "Sending..." : "Send Message"}
+          </Button>
+        </div>
+      ) : (
+        <div className="mt-4 bg-blue-600 text-white text-center py-3 rounded-xl font-medium text-sm md:text-base">
+          Feedback for this version is closed.
         </div>
       )}
+
+      {/* Closed Banner
+      // {isClosed && (
+      //   <div className="mt-4 bg-blue-600 text-white text-center py-3 rounded-xl font-medium text-sm md:text-base">
+      //     Feedback for this version is closed.
+      //   </div>
+      // )} */}
     </div>
   );
 }

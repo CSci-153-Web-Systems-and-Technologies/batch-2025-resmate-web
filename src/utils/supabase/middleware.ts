@@ -41,7 +41,7 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   const emailParam = request.nextUrl.searchParams.get('email')
 
-  const publicRoutes = ['/login', '/register', '/error']
+  const publicRoutes = ['/login', '/register']
 
   const isOtpRoute = pathname.startsWith('/otp')
 
@@ -66,7 +66,7 @@ export async function updateSession(request: NextRequest) {
     const url = request.nextUrl.clone()
     
     // If profile incomplete, redirect to setup, otherwise to dashboard
-    url.pathname = isProfileIncomplete ? '/setup' : '/'
+    url.pathname = isProfileIncomplete ? '/setup' : '/dashboard'
     
     return NextResponse.redirect(url)
   }
@@ -80,7 +80,7 @@ export async function updateSession(request: NextRequest) {
 
   // If user exists, check profile completion for protected routes
   if(user) {
-    const excludedRoutes = ['/setup', '/login', '/register', '/auth', '/error']
+    const excludedRoutes = ['/setup', '/login', '/register']
     const isExcludedRoute = excludedRoutes.some((route) => request.nextUrl.pathname.startsWith(route)) || (isOtpRoute && !!emailParam && emailParam.trim() !== '')
 
     if(!isExcludedRoute) {

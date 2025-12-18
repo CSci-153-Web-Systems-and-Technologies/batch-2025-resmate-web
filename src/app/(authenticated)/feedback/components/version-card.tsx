@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ChatMessage, VersionFeedback } from "@/lib/model/messages";
 import { FileText, MessageSquare } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { MessageBox } from "./message-box";
 import { sendMessage } from "@/lib/db/message-db";
@@ -63,8 +64,13 @@ export function VersionCard({
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-4">
         <div className="flex items-center gap-3 bg-gray-100 rounded-lg px-4 py-3 flex-1">
-          <FileText className="h-5 w-5 text-gray-600" />
-          <span className="font-medium text-sm md:text-base">{version.file_name}</span>
+          <Link href={`/feedback/annotate/${version.version_id}`}
+            className="inline-flex items-center gap-2 rounded-md bg-secondary px-3 py-2 hover:opacity-90"
+            aria-label={`Open annotations for ${version.file_name}`}
+          >
+            <FileText className="h-5 w-5 text-gray-600" />
+            <span className="font-medium text-sm md:text-base">{version.file_name}</span>
+          </Link>
         </div>
 
         <div className="flex items-center justify-between md:justify-end gap-4">
@@ -114,13 +120,6 @@ export function VersionCard({
           Feedback for this version is closed.
         </div>
       )}
-
-      {/* Closed Banner
-      // {isClosed && (
-      //   <div className="mt-4 bg-blue-600 text-white text-center py-3 rounded-xl font-medium text-sm md:text-base">
-      //     Feedback for this version is closed.
-      //   </div>
-      // )} */}
     </div>
   );
 }

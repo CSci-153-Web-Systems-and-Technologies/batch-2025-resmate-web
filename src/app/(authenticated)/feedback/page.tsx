@@ -14,17 +14,12 @@ import { ContactList } from "./components/contact-list";
 import { DraftArea } from "./components/draft-area";
 import { DraftSelectorDialog } from "./modal/draft-selector";
 
-
 export default function FeedbackPage({
-  initialConversationId,
-}: { initialConversationId?: string }) {
-  const router = useRouter();
-  // const searchParams = useSearchParams();
-  // const conversationId = searchParams.get("conversation");
-
+  initialConversationId
+} : { initialConversationId: string }) {
+  const router = useRouter()
 
   const [selectedConversation, setSelectedConversation] = useState<string | null>(initialConversationId ?? null);
-
 
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [currentUser, setCurrentUser] = useState<User | null>(null)
@@ -174,6 +169,7 @@ export default function FeedbackPage({
         {/* Desktop Sidebar - Hidden on mobile */}
         <div className="hidden md:flex w-80 bg-white flex-col border-r flex-shrink-0">
           <ContactList
+            user={currentUser}
             conversations={conversations}
             otherParticipants={otherParticipants}
             isLoadingConversations={isLoadingConversations}

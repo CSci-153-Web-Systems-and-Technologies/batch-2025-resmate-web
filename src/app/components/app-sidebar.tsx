@@ -1,3 +1,4 @@
+'use client';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { Home, MessageSquare } from "lucide-react";
 import { NavUser } from "./nav-user";

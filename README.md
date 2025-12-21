@@ -131,7 +131,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support
 
-If you encounter any issues or have questions, please [open an issue](https://github.com/KaelNierras/class-qa-board/issues) on GitHub.
+If you encounter any issues or have questions, please [open an issue]([https://github.com/KaelNierras/class-qa-board/issues](https://github.com/CSci-153-Web-Systems-and-Technologies/batch-2025-resmate-web/issues)) on GitHub.
 
 ---
 

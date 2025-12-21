@@ -41,7 +41,8 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   const emailParam = request.nextUrl.searchParams.get('email')
 
-  const publicRoutes = ['/login', '/register']
+  const publicRoutes = ['/login', '/register', '/']
+  // const authRoutes = ['/dashboard', '/feedback', '/profile', '/setup']
 
   const isOtpRoute = pathname.startsWith('/otp')
 
@@ -74,7 +75,7 @@ export async function updateSession(request: NextRequest) {
   if (!user && !isPublicRoute) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone()
-    url.pathname = '/login'
+    url.pathname = '/'
     return NextResponse.redirect(url)
   }
 

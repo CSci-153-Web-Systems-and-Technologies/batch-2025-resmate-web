@@ -1,9 +1,10 @@
+'use client';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from "@/components/ui/sidebar";
 import { Home, MessageSquare } from "lucide-react";
-import { NavUser } from "./nav-user";
 import { useEffect, useState } from "react";
 import { User } from "@/lib/model/user";
 import { getCurrentUser } from "@/lib/auth/actions/auth";
+import { NavUser } from "./nav-user";
 
 type Props = { className?: string };
 

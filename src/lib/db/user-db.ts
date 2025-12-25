@@ -3,13 +3,15 @@ import { createClient } from "../../utils/supabase/server"
 import { User } from "../model/user"
 
 export async function getUserById(userId: string): Promise<User | null> {
+  if(!userId) return null;
+
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from('users')
     .select('*')
     .eq('user_id', userId)
-    .single()
+    .maybeSingle()
 
   if(error) {
     console.error('Error fetching user:', error)

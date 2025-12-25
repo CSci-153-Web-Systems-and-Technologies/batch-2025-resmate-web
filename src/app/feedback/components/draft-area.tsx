@@ -8,27 +8,35 @@ import { SubmitDraftModal } from "../modal/submission";
 
 type DraftAreaProps = {
   draft: DraftSubmission | null;
+  initialVersions?: VersionFeedback[];
 }
 
 export function DraftArea({
   draft,
+  initialVersions,
 }: DraftAreaProps) {
   const [isOpenModal, setIsOpenModal] = useState(false);
 
-  const [versions, setVersions] = useState<VersionFeedback[]>([]);
+  const [versions, setVersions] = useState<VersionFeedback[]>(initialVersions ?? []);
 
   const draftId = draft?.draft_id;
 
   useEffect(() => {
-    // Fetch versions for the draft if needed
+    // If initial versions are provided (from a preloaded bundle), use them.
+    if (initialVersions && initialVersions.length) {
+      setVersions(initialVersions);
+      return;
+    }
+
+    // Otherwise, fall back to fetching versions for the draft on demand.
     const fetchVersions = async () => {
-      if(!draftId) return;
-      // Placeholder for fetching versions logic
+      if (!draftId) return;
       const fetchedVersions = await getVersionFeedbacks(draftId!);
       setVersions(fetchedVersions ?? []);
-    }
+    };
+
     fetchVersions();
-  }, [draftId]);
+  }, [draftId, initialVersions]);
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">

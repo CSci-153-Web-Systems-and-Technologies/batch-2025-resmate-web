@@ -209,7 +209,14 @@ export default function FeedbackClient(props: {
 
               {/* Draft content */}
               {selectedDraft ? (
-                <DraftArea draft={selectedDraft} />
+                <DraftArea
+                  draft={selectedDraft}
+                  initialVersions={
+                    selectedDraft
+                      ? versionsByDraft.get(selectedDraft.draft_id!) ?? []
+                      : []
+                  }
+                />
               ) : drafts.length > 0 ? (
                 <div className="flex-1 flex items-center justify-center text-gray-400">
                   Select a draft to view feedback

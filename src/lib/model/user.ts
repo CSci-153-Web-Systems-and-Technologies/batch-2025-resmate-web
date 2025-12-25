@@ -6,3 +6,11 @@ export type User = {
   role?: string;
   department?: string;
 }
+
+export type Thesis = {
+  thesisId: string;
+  userId: string;
+  title: string;
+  description: string;
+  createdAt?: string;
+}

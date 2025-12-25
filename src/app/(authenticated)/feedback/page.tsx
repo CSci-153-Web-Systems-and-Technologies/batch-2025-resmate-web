@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/actions/auth";
 import { User } from "@/lib/model/user";
 import { Conversation, DraftSubmission } from "@/lib/model/messages";
-import { getConversations, getDraftSubmissions, getUserParticipants } from "@/lib/db/message-db";
+import { getConversations, getUserParticipants, getDraftsVersionsMessagesByConversation } from "@/lib/db/message-db";
 import { ContactList } from "./components/contact-list";
 import { DraftArea } from "./components/draft-area";
 import { DraftSelectorDialog } from "./modal/draft-selector";

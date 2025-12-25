@@ -44,15 +44,15 @@ export async function login(formData: FormData) {
     console.error('Login error:', error)
 
     if(error.message.includes('Invalid login credentials')) {
-      return new Error('Invalid email or password. Please try again.');
+      return { error: 'Invalid email or password. Please try again.' }
     }
 
     if(error.message.includes('Email not confirmed')) {
-      return new Error('Email not confirmed. Please check your inbox for a confirmation email.');
+      return { error: 'Email not confirmed. Please check your inbox for a confirmation email.' }
     }
 
     if(error.message.includes('User not found')) {
-      return new Error('User not found. Please check your email or sign up for a new account.');
+      return { error: 'User not found. Please check your email or sign up for a new account.' }
     }
 
     return { error: error.message || 'Failed to login. Please try again.'}
@@ -85,23 +85,82 @@ export async function login(formData: FormData) {
   redirect('/')
 }
 
+
 export async function signup(formData: FormData) {
   const supabase = await createClient()
+  const email = formData.get("email") as string
+  const password = formData.get("password") as string
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
+  const isEmail = email.includes('@') && email.includes('.')
+  if (!isEmail) {
+    return { error: "Please enter a valid email address." }
   }
 
-  const { error } = await supabase.auth.signUp(data)
-
+  const { error } = await supabase.auth.signUp({ email, password })
   if (error) {
-    redirect('/error')
+    console.error('Signup error:', error)
+    return { error: error.message || "Failed to send OTP. Please try again." }
   }
 
-  redirect(`/otp?email=${encodeURIComponent(data.email)}`);
+
+
+  // const { data: signUpResult, error } = 
+  // await supabase.auth.signUp({ email, password })
+  // if (error) return { error: error.message }
+
+  // const user = signUpResult.user
+  // if (user?.id && user.email) {
+  //   const otp = Math.floor(100000 + Math.random() * 900000).toString() // 6 digits
+
+  //   const token = createEmailVerificationToken(
+  //     { userId: user.id, email: user.email, otp: otp },
+  //     10 * 60 // 10 minutes
+  //   )
+
+  //   // store token somewhere the browser can send back, e.g. cookie
+  //   // (App Router: use headers/NextResponse in a route, or set cookie in a dedicated API route)
+
+  //   const cookieStore = await cookies()
+  //   cookieStore.set('email_verification_token', token, {
+  //     httpOnly: true,
+  //     secure: process.env.NODE_ENV === 'production',
+  //     maxAge: 10 * 60, // 10 minutes
+  //   })
+
+    
+
+  //   await transporter.sendMail({
+  //     from: process.env.EMAIL_SMTP_USER!,
+  //     to: user.email,
+  //     subject: "Your verification code",
+  //     text: `Your verification code is: ${otp}`,
+  //   })
+  // }
+
+  return redirect("/otp?email=" + encodeURIComponent(email))
+}
+
+
+export async function verifyOTP({ email, otp }: { email: string, otp: string }) {
+  const supabase = await createClient()
+
+  if (!email || !otp) {
+    return { error: "Email and OTP are required." }
+  }
+
+  const { error } = await supabase.auth.verifyOtp({
+    email,
+    token: otp,
+    type: 'signup'
+  })
+
+  if(error) {
+    console.error('OTP verification error:', error)
+    return { error: error.message || "Failed to verify OTP. Please try again." }
+  }
+
+  revalidatePath('/setup', 'layout')
+  redirect('/setup')
 }
 
 
@@ -182,7 +241,7 @@ export async function completeUserProfile(formData: FormData) {
     return { error: 'An unexpected error occurred' }
   }
 
-  redirect('/')
+  redirect('/dashboard')
 }
 
 
@@ -196,5 +255,5 @@ export async function logout() {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/login')
+  redirect('/')
 }

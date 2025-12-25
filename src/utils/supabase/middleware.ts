@@ -39,71 +39,38 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser()
 
   const pathname = request.nextUrl.pathname
-  const emailParam = request.nextUrl.searchParams.get('email')
+  // const emailParam = request.nextUrl.searchParams.get('email')
 
-  const publicRoutes = ['/login', '/register', '/']
-  // const authRoutes = ['/dashboard', '/feedback', '/profile', '/setup']
+  const publicRoutes = ['/login', '/register', '/', '/otp']
 
-  const isOtpRoute = pathname.startsWith('/otp')
+  const isPublicRoute = publicRoutes.some((route) => pathname === route || pathname.startsWith(route))
 
-  const isPublicRoute = publicRoutes.some((route) => request.nextUrl.pathname.startsWith(route)) || (isOtpRoute && !!emailParam && emailParam.trim() !== '')
+  const currentUser = user?.id ? await getUserById(user.id) : null
 
-   // If user is authenticated and trying to access login/register, redirect to home
-  if (user && isPublicRoute) {
-    const currentUser = await getUserById(user.id)
-    
-    // Check if profile is incomplete
-    const isProfileIncomplete = 
-      !currentUser || 
-      !currentUser.firstName || 
-      !currentUser.lastName || 
-      !currentUser.role || 
-      !currentUser.department ||
-      currentUser.firstName.trim() === '' || 
-      currentUser.lastName.trim() === '' ||
-      currentUser.role.trim() === '' ||
-      currentUser.department.trim() === ''
+  let isCompleteSetup = false
 
-    const url = request.nextUrl.clone()
-    
-    // If profile incomplete, redirect to setup, otherwise to dashboard
-    url.pathname = isProfileIncomplete ? '/setup' : '/dashboard'
-    
-    return NextResponse.redirect(url)
+  if (currentUser) {
+    isCompleteSetup = !!(
+      currentUser.firstName.trim() &&
+      currentUser.lastName.trim() &&
+      currentUser.department?.trim() &&
+      currentUser.role
+    )
   }
 
-  if (!user && !isPublicRoute) {
-    // no user, potentially respond by redirecting the user to the login page
-    const url = request.nextUrl.clone()
+  const url = request.nextUrl.clone()
+
+  if (currentUser && isCompleteSetup && (pathname === '/' || pathname === '/login' || pathname === '/register' || pathname === '/setup')) {
+    url.pathname = '/dashboard'
+    return NextResponse.redirect(url)
+  }
+  else if (currentUser && !isCompleteSetup && pathname !== '/setup') {
+    url.pathname = '/setup'
+    return NextResponse.redirect(url)
+  }
+  else if (!currentUser && !isPublicRoute) {
     url.pathname = '/'
     return NextResponse.redirect(url)
-  }
-
-  // If user exists, check profile completion for protected routes
-  if(user) {
-    const excludedRoutes = ['/setup', '/login', '/register']
-    const isExcludedRoute = excludedRoutes.some((route) => request.nextUrl.pathname.startsWith(route)) || (isOtpRoute && !!emailParam && emailParam.trim() !== '')
-
-    if(!isExcludedRoute) {
-      const currentUser = await getUserById(user.id)
-
-      const isProfileIncomplete = 
-        !currentUser || 
-        !currentUser.firstName || 
-        !currentUser.lastName || 
-        !currentUser.role || 
-        !currentUser.department ||
-        currentUser.firstName.trim() === '' || 
-        currentUser.lastName.trim() === '' ||
-        currentUser.role.trim() === '' ||
-        currentUser.department.trim() === ''
-
-      if (isProfileIncomplete) {
-        const url = request.nextUrl.clone()
-        url.pathname = '/setup'
-        return NextResponse.redirect(url)
-      }
-    }
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.

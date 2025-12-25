@@ -130,6 +130,85 @@ export async function loadConversationBundle(conversationId: string, currentUser
   };
 }
 
+// Fetch drafts, their versions, and all messages for each version in a single query using conversation_id.
+export type DraftWithVersionsAndMessages = DraftSubmission & {
+  versions: (VersionFeedback & { messages: ChatMessage[] })[];
+};
+
+export async function getDraftsVersionsMessagesByConversation(
+  conversationId: string
+): Promise<DraftWithVersionsAndMessages[]> {
+  const supabase = await createClient();
+
+  const { data, error } = await supabase
+    .from('draft_submissions')
+    .select(`
+      draft_id,
+      conversation_id,
+      title,
+      created_at,
+      versions:version_feedback (
+        version_id,
+        draft_id,
+        file_url,
+        file_name,
+        is_closed,
+        created_at,
+        messages:messages (
+          message_id,
+          version_id,
+          sender_id,
+          message,
+          created_at
+        )
+      )
+    `)
+    .eq('conversation_id', conversationId)
+    .order('created_at', { ascending: true })
+    // .order('versions.created_at', { ascending: true })
+    // .order('versions.messages.created_at', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching drafts/versions/messages:', error);
+    return [];
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rows = (data ?? []) as any[];
+
+  return rows.map((d) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const versions = (d.versions ?? []).map((v: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const messages = (v.messages ?? []).map((m: any) => ({
+        message_id: m.message_id,
+        version_id: m.version_id,
+        sender_id: m.sender_id,
+        message: m.message,
+        created_at: m.created_at,
+      } as ChatMessage));
+
+      return {
+        version_id: v.version_id,
+        draft_id: v.draft_id,
+        file_url: v.file_url,
+        file_name: v.file_name,
+        isClosed: v.is_closed,
+        created_at: v.created_at,
+        messages,
+      } as VersionFeedback & { messages: ChatMessage[] };
+    });
+
+    return {
+      draft_id: d.draft_id,
+      conversation_id: d.conversation_id,
+      draft_title: d.title,
+      created_at: d.created_at,
+      versions,
+    } as DraftWithVersionsAndMessages;
+  });
+}
+
 // ...existing code...
 
 export async function closeOlderVersionsForDraft(draftId: string): Promise<void> {

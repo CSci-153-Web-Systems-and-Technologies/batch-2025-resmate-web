@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth/actions/auth";
 import { User } from "@/lib/model/user";
 import { Conversation, DraftSubmission } from "@/lib/model/messages";
-import { getConversations, getDraftSubmissions, getUserParticipants } from "@/lib/db/message-db";
+import { getConversations, getUserParticipants, getDraftsVersionsMessagesByConversation } from "@/lib/db/message-db";
 import { ContactList } from "./components/contact-list";
 import { DraftArea } from "./components/draft-area";
 import { DraftSelectorDialog } from "./modal/draft-selector";
@@ -28,6 +28,9 @@ export default function FeedbackPage({
   const [otherParticipants, setOtherParticipants] = useState<Map<string, User>>(new Map());
 
   const [selectedDraft, setSelectedDraft] = useState<DraftSubmission | null>(null);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [draftVersionsById, setDraftVersionsById] = useState<Map<string, any[]>>(new Map());
 
   const [isDraftSelectorOpen, setIsDraftSelectorOpen] = useState(false);
 
@@ -56,19 +59,33 @@ export default function FeedbackPage({
     const loadDraftForConversation = async () => {
       if (!selectedConversation) {
         setSelectedDraft(null);
-        // setThreadVersions([]);
+        setDraftVersionsById(new Map());
         return;
       }
 
       try {
-        const drafts = await getDraftSubmissions(selectedConversation);
-        // setDrafts(drafts);
+        // Use optimized single query to load drafts + versions for this conversation
+        const bundle = await getDraftsVersionsMessagesByConversation(selectedConversation);
 
-        if(!drafts.length) {
+        if(!bundle.length) {
           setSelectedDraft(null);
-          // setThreadVersions([]);
+          setDraftVersionsById(new Map());
           return;
         }
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const versionsMap = new Map<string, any[]>();
+        bundle.forEach(d => {
+          versionsMap.set(d.draft_id!, d.versions || []);
+        });
+        setDraftVersionsById(versionsMap);
+
+        const drafts = bundle.map(d => ({
+          draft_id: d.draft_id,
+          conversation_id: d.conversation_id,
+          draft_title: d.draft_title,
+          created_at: d.created_at,
+        } as DraftSubmission));
 
         // Pick latest by created_at (fallback to first)
         const latest =
@@ -81,7 +98,7 @@ export default function FeedbackPage({
       } catch (error) {
         console.error("Error loading draft submissions:", error);
         setSelectedDraft(null);
-        // setThreadVersions([]);
+        setDraftVersionsById(new Map());
       }
     };
 
@@ -264,6 +281,7 @@ export default function FeedbackPage({
               {selectedDraft ? (
                 <DraftArea
                   draft={selectedDraft}
+                  initialVersions={draftVersionsById.get(selectedDraft.draft_id!) ?? []}
                 />
               ) : (
                 <div className="flex-1 flex items-center justify-center text-gray-400">

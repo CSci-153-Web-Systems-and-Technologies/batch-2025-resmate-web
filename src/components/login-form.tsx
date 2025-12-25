@@ -1,3 +1,5 @@
+import { useState } from "react"
+
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -16,6 +18,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { useFormStatus } from "react-dom"
 import { login } from "@/lib/auth/actions/auth"
+import { AlertProp } from "@/components/alert-prop"
+import { CircleAlert, User } from "lucide-react"
 
 
 function SubmitButton() {
@@ -33,17 +37,22 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
 
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
   const handleSubmit = async (formData: FormData) => {
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
 
     if(!email || !password || email.trim() === '' || password.trim() === '') {
-      return;
+      setErrorMessage('Email and password are required.')
+      return
     }
-    const result = await login(formData);
+    setErrorMessage(null)
 
-    if(result instanceof Error) {
-      console.error("Login failed:", result.message);
+    const result = await login(formData) as { error?: string } | void
+
+    if (result && "error" in result && result.error) {
+      setErrorMessage(result.error)
     }
     
   }
@@ -60,6 +69,15 @@ export function LoginForm({
         <CardContent>
           <form action={handleSubmit}>
             <FieldGroup>
+              {errorMessage && (
+                <Field>
+                  <AlertProp
+                    icon={<CircleAlert />}
+                    title="Login failed"
+                    description={errorMessage}
+                  />
+                </Field>
+              )}
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input

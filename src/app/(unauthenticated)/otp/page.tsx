@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Suspense, useEffect } from "react"
 
- function OTPContent() {
+function OTPContent() {
   const searchParams = useSearchParams()
   const router = useRouter()
   const email = searchParams.get("email")
@@ -23,7 +23,7 @@ import { Suspense, useEffect } from "react"
   return (
     <div className="flex min-h-svh w-full items-center justify-center p-6 md:p-10">
       <div className="w-full max-w-xs">
-        <OTPForm />
+        <OTPForm email={email} />
       </div>
     </div>
   )
